@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}New Booking - Step 2 - PlayStation Lounge{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Progress Bar -->
+    <div class="mb-4">
+        <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Step 1: Customer Info</span>
+            <span class="fw-bold text-purple">Step 2: Add Facilities</span>
+        </div>
+        <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-purple" role="progressbar" style="width: 100%"></div>
+        </div>
+    </div>
+
+    <!-- Booking Summary -->
+    <div class="card mb-4 fade-in-up">
+        <div class="card-header bg-gradient-purple text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>Booking Summary
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Customer:</strong> {{ booking.customer_name }}</p>
+                    <p><strong>Phone:</strong> {{ booking.phone }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Date & Time:</strong> {{ booking.booking_date|date:"M d, Y H:i" }}</p>
+                    <p><strong>Duration:</strong> {{ booking.duration_hours }} hours</p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Total Price: <span class="price-display">${{ booking.get_total_price }}</span></h5>
+                <div>
+                    <a href="{% url 'bookings:booking_detail' booking.pk %}" class="btn btn-success me-2">
+                        <i class="fas fa-check me-2"></i>Finish Booking
+                    </a>
+                    <a href="{% url 'bookings:booking_update' booking.pk %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-edit me-2"></i>Edit Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Gaming Rooms -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 fade-in-up">
+                <div class="card-header bg-gradient-red text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tv me-2"></i>Gaming Rooms
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Add Room Form -->
+                    <form method="post" action="{% url 'bookings:add_booking_room' booking.pk %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <select name="room" class="form-control form-control-sm" required>
+                                <option value="">Select Room</option>
+                                {% for room in rooms %}
+                                    <option value="{{ room.pk }}">{{ room.name }} - ${{ room.hourly_price }}/hr</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <input type="number" name="hours" class="form-control form-control-sm" 
+                                   placeholder="Hours" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-red btn-sm w-100">
+                            <i class="fas fa-plus me-1"></i>Add Room
+                        </button>
+                    </form>
+
+                    <!-- Current Rooms -->
+                    {% for booking_room in booking_rooms %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                        <div>
+                            <strong>{{ booking_room.room.name }}</strong><br>
+                            <small>{{ booking_room.hours }}h × ${{ booking_room.room.hourly_price }} = ${{ booking_room.get_subtotal }}</small>
+                        </div>
+                        <a href="{% url 'bookings:delete_booking_room' booking_room.pk %}" 
+                           class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small">No rooms added yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Billiard Tables -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 fade-in-up">
+                <div class="card-header bg-gradient-orange text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-circle me-2"></i>Billiard Tables
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Add Billiard Form -->
+                    <form method="post" action="{% url 'bookings:add_booking_billiard' booking.pk %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <select name="billiard_table" class="form-control form-control-sm" required>
+                                <option value="">Select Table</option>
+                                {% for billiard in billiards %}
+                                    <option value="{{ billiard.pk }}">{{ billiard.name }} - ${{ billiard.hourly_price }}/hr</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <input type="number" name="hours" class="form-control form-control-sm" 
+                                   placeholder="Hours" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-orange btn-sm w-100">
+                            <i class="fas fa-plus me-1"></i>Add Table
+                        </button>
+                    </form>
+
+                    <!-- Current Billiards -->
+                    {% for booking_billiard in booking_billiards %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                        <div>
+                            <strong>{{ booking_billiard.billiard_table.name }}</strong><br>
+                            <small>{{ booking_billiard.hours }}h × ${{ booking_billiard.billiard_table.hourly_price }} = ${{ booking_billiard.get_subtotal }}</small>
+                        </div>
+                        <a href="{% url 'bookings:delete_booking_billiard' booking_billiard.pk %}" 
+                           class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small">No tables added yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Items -->
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 fade-in-up">
+                <div class="card-header bg-gradient-green text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-utensils me-2"></i>Food & Drinks
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Add Menu Form -->
+                    <form method="post" action="{% url 'bookings:add_booking_menu' booking.pk %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <select name="menu_item" class="form-control form-control-sm" required>
+                                <option value="">Select Item</option>
+                                {% for item in menu_items %}
+                                    <option value="{{ item.pk }}">{{ item.name }} - ${{ item.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <input type="number" name="quantity" class="form-control form-control-sm" 
+                                   placeholder="Quantity" min="1" required>
+                        </div>
+                        <button type="submit" class="btn btn-green btn-sm w-100">
+                            <i class="fas fa-plus me-1"></i>Add Item
+                        </button>
+                    </form>
+
+                    <!-- Current Menu Items -->
+                    {% for booking_menu in booking_menu_items %}
+                    <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                        <div>
+                            <strong>{{ booking_menu.menu_item.name }}</strong><br>
+                            <small>{{ booking_menu.quantity }}× ${{ booking_menu.menu_item.price }} = ${{ booking_menu.get_subtotal }}</small>
+                        </div>
+                        <a href="{% url 'bookings:delete_booking_menu' booking_menu.pk %}" 
+                           class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small">No items added yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

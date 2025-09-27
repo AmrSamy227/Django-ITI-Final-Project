@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Bookings - PlayStation Lounge{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold text-purple">
+                <i class="fas fa-calendar-check me-3"></i>Bookings
+            </h1>
+            <p class="text-muted">Manage customer bookings</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'bookings:booking_create_step1' %}" class="btn btn-purple btn-lg">
+                <i class="fas fa-plus me-2"></i>New Booking
+            </a>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="GET" class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search bookings..." value="{{ search_query }}">
+            </form>
+        </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="card fade-in-up">
+        <div class="card-body p-0">
+            {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Booking #</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Date & Time</th>
+                            <th>Duration</th>
+                            <th>Total Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td><strong>#{{ booking.pk }}</strong></td>
+                            <td>{{ booking.customer_name }}</td>
+                            <td>{{ booking.phone }}</td>
+                            <td>{{ booking.booking_date|date:"M d, Y H:i" }}</td>
+                            <td>{{ booking.duration_hours }} hours</td>
+                            <td class="price-display">${{ booking.get_total_price }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'bookings:booking_detail' booking.pk %}" 
+                                       class="btn btn-outline-purple" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'bookings:booking_update' booking.pk %}" 
+                                       class="btn btn-outline-orange" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'bookings:booking_delete' booking.pk %}" 
+                                       class="btn btn-outline-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                <h3>No Bookings Found</h3>
+                <p class="text-muted">
+                    {% if search_query %}
+                        No bookings match your search criteria.
+                    {% else %}
+                        Start by creating your first booking.
+                    {% endif %}
+                </p>
+                <a href="{% url 'bookings:booking_create_step1' %}" class="btn btn-purple">
+                    <i class="fas fa-plus me-2"></i>Create First Booking
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

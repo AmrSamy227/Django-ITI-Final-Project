@@ -1,0 +1,307 @@
+/* Custom CSS for PlayStation Lounge */
+
+:root {
+    --purple: #8b5cf6;
+    --red: #ef4444;
+    --orange: #f97316;
+    --green: #22c55e;
+    --purple-dark: #7c3aed;
+    --red-dark: #dc2626;
+    --orange-dark: #ea580c;
+    --green-dark: #16a34a;
+}
+i.fas.fa-gamepad {
+  color: #ff4500; /* orange */
+  font-size: 24px; /* كمان تقدر تكبر أو تصغر */
+}
+
+
+/* Background Gradients */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--red) 100%);
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(135deg, var(--orange) 0%, var(--green) 100%);
+}
+
+.bg-gradient-purple {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+}
+
+.bg-gradient-red {
+    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+}
+
+.bg-gradient-orange {
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dark) 100%);
+}
+
+.bg-gradient-green {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+}
+
+/* Body Styling */
+body {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    min-height: 100vh;
+}
+
+/* Card Styling */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Colorful Cards */
+.card-purple {
+    border-left: 5px solid var(--purple);
+}
+
+.card-red {
+    border-left: 5px solid var(--red);
+}
+
+.card-orange {
+    border-left: 5px solid var(--orange);
+}
+
+.card-green {
+    border-left: 5px solid var(--green);
+}
+
+/* Button Styling */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-purple {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: white;
+}
+
+.btn-purple:hover {
+    background: var(--purple-dark);
+    border-color: var(--purple-dark);
+    color: white;
+}
+
+.btn-red {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+}
+
+.btn-red:hover {
+    background: var(--red-dark);
+    border-color: var(--red-dark);
+    color: white;
+}
+
+.btn-orange {
+    background: var(--orange);
+    border-color: var(--orange);
+    color: white;
+}
+
+.btn-orange:hover {
+    background: var(--orange-dark);
+    border-color: var(--orange-dark);
+    color: white;
+}
+
+.btn-green {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+}
+
+.btn-green:hover {
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+    color: white;
+}
+
+/* Form Styling */
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+}
+
+/* Table Styling */
+.table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.table thead {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--red) 100%);
+    color: white;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(139, 92, 246, 0.1);
+}
+
+/* Badge Styling */
+.badge {
+    font-size: 0.8em;
+    padding: 0.5em 0.8em;
+    border-radius: 20px;
+}
+
+.badge-purple {
+    background: var(--purple);
+}
+
+.badge-red {
+    background: var(--red);
+}
+
+.badge-orange {
+    background: var(--orange);
+}
+
+.badge-green {
+    background: var(--green);
+}
+
+/* Alert Styling */
+.alert {
+    border-radius: 15px;
+    border: none;
+}
+
+/* Icon Styling */
+.fa-gamepad { color: var(--purple); }
+.fa-tv { color: var(--red); }
+.fa-circle { color: var(--orange); }
+.fa-utensils { color: var(--green); }
+.fa-calendar-check { color: var(--purple); }
+.fa-users { color: var(--red); }
+
+/* Price Display */
+.price-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--green);
+}
+
+/* Stat Cards */
+.stat-card {
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: scale(1.05);
+}
+
+/* Search Bar */
+.search-container {
+    position: relative;
+}
+
+.search-container .form-control {
+    padding-left: 3rem;
+}
+
+.search-container .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table-responsive {
+        border-radius: 15px;
+    }
+}
+
+/* Loading Animation */
+.spinner-border-custom {
+    width: 3rem;
+    height: 3rem;
+    color: var(--purple);
+}
+
+/* Footer Styling */
+footer {
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+}
+
+/* خلى html و body طولهم طول الشاشة */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* خلي body فليكس */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* علشان ياخد ارتفاع الشاشة كلها */
+}
+
+/* خلي المحتوى ياخد كل المساحة الباقية */
+main.container-fluid {
+  flex: 1;
+}
+
+/* Footer Styling */
+footer {
+  background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+  color: #fff;
+}
