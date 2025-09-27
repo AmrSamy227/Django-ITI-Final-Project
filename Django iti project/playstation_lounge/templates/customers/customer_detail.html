@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ customer.name }} - PlayStation Lounge{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-6 fw-bold">
+                <i class="fas fa-user text-red me-3"></i>{{ customer.name }}
+            </h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <a href="{% url 'customers:customer_update' customer.pk %}" class="btn btn-orange">
+                    <i class="fas fa-edit me-2"></i>Edit
+                </a>
+                <a href="{% url 'customers:customer_delete' customer.pk %}" class="btn btn-red">
+                    <i class="fas fa-trash me-2"></i>Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Customer Information -->
+        <div class="col-md-4 mb-4">
+            <div class="card card-red fade-in-up">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Contact Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ customer.name }}</p>
+                    <p><strong>Phone:</strong> {{ customer.phone }}</p>
+                    {% if customer.email %}
+                        <p><strong>Email:</strong> {{ customer.email }}</p>
+                    {% else %}
+                        <p><strong>Email:</strong> <em>Not provided</em></p>
+                    {% endif %}
+                    <p><strong>Member Since:</strong> {{ customer.created_at|date:"M d, Y" }}</p>
+                    <hr>
+                    <div class="text-center">
+                        <h3 class="price-display">{{ customer.get_total_bookings }}</h3>
+                        <p class="text-muted">Total Bookings</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking History -->
+        <div class="col-md-8">
+            <div class="card fade-in-up">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Booking History
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Booking #</th>
+                                    <th>Date & Time</th>
+                                    <th>Duration</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td><strong>#{{ booking.pk }}</strong></td>
+                                    <td>{{ booking.booking_date|date:"M d, Y H:i" }}</td>
+                                    <td>{{ booking.duration_hours }} hours</td>
+                                    <td class="fw-bold text-success">${{ booking.get_total_price }}</td>
+                                    <td>
+                                        <a href="{% url 'bookings:booking_detail' booking.pk %}" 
+                                           class="btn btn-outline-purple btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5>No Bookings Yet</h5>
+                        <p class="text-muted">This customer hasn't made any bookings.</p>
+                        <a href="{% url 'bookings:booking_create_step1' %}" class="btn btn-purple">
+                            <i class="fas fa-plus me-2"></i>Create First Booking
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'customers:customer_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Customers
+        </a>
+    </div>
+</div>
+{% endblock %}
