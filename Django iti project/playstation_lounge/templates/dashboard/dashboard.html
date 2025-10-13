@@ -3,6 +3,55 @@
 {% block title %}Dashboard - Rio PlayStation Lounge{% endblock %}
 
 {% block content %}
+<!-- Custom CSS for fixed chart height and proper responsiveness -->
+<style>
+    /* Ensures the card is a Flex container to properly use h-100 */
+    .card {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* CRITICAL: Wraps the canvas, fixes the height, and sets position for responsiveness */
+    .chart-container {
+        position: relative;
+        height: 280px; /* Fixed height for consistent card size */
+        width: 100%;
+    }
+
+    /* --- MOBILE STYLING FOR KPI CARDS (Below 768px) --- */
+    @media (max-width: 767px) {
+        /* Forces a minimum height to push the card towards a square shape */
+        .kpi-row .card {
+            min-height: 110px; 
+            padding: 0.75rem; /* Reduced padding for compact look */
+        }
+        
+        /* Ensures content uses all available space and centers text */
+        .kpi-row .card-body {
+            padding: 0 !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* Override Bootstrap text sizing for small space */
+        }
+        
+        .kpi-row h6 {
+            font-size: 0.7rem !important; /* Smaller title */
+            margin-bottom: 0.2rem !important;
+            white-space: nowrap; /* Prevent wrapping on title */
+        }
+        
+        .kpi-row h2 {
+            font-size: 1.35rem !important; /* Smaller value */
+        }
+
+        .kpi-row .fs-1 {
+            font-size: 1.5rem !important; /* Smaller icon */
+        }
+    }
+    /* --- END MOBILE STYLING --- */
+</style>
+
 <div class="container-fluid">
     <div class="row mb-4">
         <div class="col-12">
@@ -12,26 +61,39 @@
 
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
+                    <!-- UPDATED FILTER FORM: Using Date From and Date To inputs -->
                     <form method="get" class="row g-3 align-items-center">
                         <div class="col-auto">
-                            <label class="form-label fw-bold">Filter by Date Range:</label>
+                            <label for="start_date" class="form-label fw-bold">Date From:</label>
                         </div>
                         <div class="col-auto">
-                            <select name="filter" class="form-select" onchange="this.form.submit()">
-                                <option value="all" {% if date_filter == 'all' %}selected{% endif %}>All Time</option>
-                                <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
-                                <option value="week" {% if date_filter == 'week' %}selected{% endif %}>Last 7 Days</option>
-                                <option value="month" {% if date_filter == 'month' %}selected{% endif %}>Last 30 Days</option>
-                            </select>
+                            <!-- Assumes 'start_date_filter' is passed in the Django context -->
+                            <input type="date" name="start_date" id="start_date" class="form-control" 
+                                value="{{ start_date_filter|default:'' }}">
+                        </div>
+                        
+                        <div class="col-auto">
+                            <label for="end_date" class="form-label fw-bold">Date To:</label>
+                        </div>
+                        <div class="col-auto">
+                            <!-- Assumes 'end_date_filter' is passed in the Django context -->
+                            <input type="date" name="end_date" id="end_date" class="form-control" 
+                                value="{{ end_date_filter|default:'' }}">
+                        </div>
+
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">Apply Filter</button>
                         </div>
                     </form>
+                    <!-- END UPDATED FILTER FORM -->
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
+    <!-- KPI Cards Row - Uses 'col-6' for 2 columns on mobile, 'col-md-3' for 4 columns on desktop -->
+    <div class="row g-4 mb-4 kpi-row">
+        <div class="col-6 col-md-3">
             <div class="card shadow-sm h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                 <div class="card-body text-white">
                     <div class="d-flex justify-content-between align-items-center">
@@ -47,7 +109,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
             <div class="card shadow-sm h-100" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                 <div class="card-body text-white">
                     <div class="d-flex justify-content-between align-items-center">
@@ -63,7 +125,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
             <div class="card shadow-sm h-100" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                 <div class="card-body text-white">
                     <div class="d-flex justify-content-between align-items-center">
@@ -79,7 +141,7 @@
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
             <div class="card shadow-sm h-100" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
                 <div class="card-body text-white">
                     <div class="d-flex justify-content-between align-items-center">
@@ -96,6 +158,7 @@
         </div>
     </div>
 
+    <!-- Chart Row 1 -->
     <div class="row g-4 mb-4">
         <div class="col-md-4">
             <div class="card shadow-sm h-100">
@@ -103,7 +166,9 @@
                     <h5 class="card-title fw-bold mb-3">
                         <i class="fas fa-coins me-2 text-success"></i>Revenue Breakdown
                     </h5>
-                    <canvas id="revenueChart" height="250"></canvas>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -114,12 +179,15 @@
                     <h5 class="card-title fw-bold mb-3">
                         <i class="fas fa-clock me-2 text-primary"></i>Total Hours Played per Room
                     </h5>
-                    <canvas id="roomHoursChart" height="250"></canvas>
+                    <div class="chart-container">
+                        <canvas id="roomHoursChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Chart Row 2 -->
     <div class="row g-4 mb-4">
         <div class="col-md-6">
             <div class="card shadow-sm h-100">
@@ -127,7 +195,9 @@
                     <h5 class="card-title fw-bold mb-3">
                         <i class="fas fa-trophy me-2 text-warning"></i>Most Booked Rooms
                     </h5>
-                    <canvas id="mostBookedRoomsChart" height="250"></canvas>
+                    <div class="chart-container">
+                        <canvas id="mostBookedRoomsChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,12 +208,15 @@
                     <h5 class="card-title fw-bold mb-3">
                         <i class="fas fa-circle me-2 text-info"></i>Billiard Tables Usage (Hours)
                     </h5>
-                    <canvas id="billiardHoursChart" height="250"></canvas>
+                    <div class="chart-container">
+                        <canvas id="billiardHoursChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Chart/Table Row 3 -->
     <div class="row g-4 mb-4">
         <div class="col-md-6">
             <div class="card shadow-sm h-100">
@@ -151,7 +224,9 @@
                     <h5 class="card-title fw-bold mb-3">
                         <i class="fas fa-utensils me-2 text-danger"></i>Top Ordered Menu Items
                     </h5>
-                    <canvas id="topMenuItemsChart" height="250"></canvas>
+                    <div class="chart-container">
+                        <canvas id="topMenuItemsChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,32 +238,34 @@
                         <i class="fas fa-user-friends me-2 text-success"></i>Top 10 Customers
                     </h5>
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th class="text-end">Bookings</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for customer in top_customers %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{ customer.name }}</td>
-                                    <td>{{ customer.phone }}</td>
-                                    <td class="text-end">
-                                        <span class="badge bg-primary">{{ customer.booking_count }}</span>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="4" class="text-center text-muted">No customer data available</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        <div style="max-height: 280px; overflow-y: auto;">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th class="text-end">Bookings</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for customer in top_customers %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ customer.name }}</td>
+                                        <td>{{ customer.phone }}</td>
+                                        <td class="text-end">
+                                            <span class="badge bg-primary">{{ customer.booking_count }}</span>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">No customer data available</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -198,6 +275,33 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Helper function to create a vertical glossy gradient for the bars
+    function createGlossyGradient(ctx, top, bottom, color1, color2) {
+        // Creates a vertical gradient from the top of the chart area to the bottom
+        const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+        
+        // Define stop points for the glossy effect (lightest on top/bottom, darker in the middle)
+        gradient.addColorStop(0, color1);    // Top Highlight
+        gradient.addColorStop(0.5, color2);  // Middle Base Color
+        gradient.addColorStop(1, color1);    // Bottom Highlight
+        return gradient;
+    }
+
+    // Utility function to handle responsiveness on window resize (Chart.js needs this for fixed containers)
+    function resizeChart(chart) {
+        if (chart) {
+            chart.resize();
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        resizeChart(revenueChart);
+        resizeChart(roomHoursChart);
+        resizeChart(mostBookedRoomsChart);
+        resizeChart(billiardHoursChart);
+        resizeChart(topMenuItemsChart);
+    });
+
     const revenueData = {
         labels: ['Gaming Revenue', 'Billiard Revenue', 'Menu Revenue'],
         datasets: [{
@@ -226,7 +330,7 @@
         data: revenueData,
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: false, // Critical for fixed height container
             plugins: {
                 legend: {
                     position: 'bottom',
@@ -248,9 +352,20 @@
                     {{ room.total_hours|default:0 }}{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ],
-            backgroundColor: 'rgba(75, 192, 192, 0.8)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 2
+            // Use a function to apply the glossy gradient effect
+            backgroundColor: (context) => {
+                const chart = context.chart;
+                const { ctx, chartArea } = chart;
+                if (!chartArea) return 'rgba(52, 152, 219, 0.9)'; // Fallback
+
+                // Blue gradient for hours played (similar to the first bar in your image)
+                const color1 = 'rgba(128, 203, 255, 1)'; // Lighter blue (Highlight)
+                const color2 = 'rgba(29, 110, 185, 1)';  // Darker blue (Base)
+
+                return createGlossyGradient(ctx, chartArea.top, chartArea.bottom, color1, color2);
+            },
+            borderColor: 'rgba(255, 255, 255, 0.2)', // White border for 'glow' effect
+            borderWidth: 1.5
         }]
     };
 
@@ -258,14 +373,30 @@
         type: 'bar',
         data: roomHoursData,
         options: {
+            indexAxis: 'y', // Progress Chart: Make it horizontal
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: false, // Critical for fixed height container
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
+                    // Hide X-axis grid lines and ticks for a cleaner progress bar look
+                    grid: {
+                        display: false
+                    },
                     ticks: {
-                        stepSize: 1
+                        display: false 
                     }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            elements: {
+                bar: {
+                    borderRadius: 10, // Increased rounded corners for pipe look
+                    borderSkipped: false,
                 }
             },
             plugins: {
@@ -275,6 +406,15 @@
             }
         }
     });
+
+    // Color map for most booked rooms (iterates through these colors for variety)
+    const mostBookedColors = [
+        { c1: 'rgba(255, 150, 170, 1)', c2: 'rgba(200, 40, 70, 1)' }, // Reddish
+        { c1: 'rgba(120, 200, 255, 1)', c2: 'rgba(30, 120, 200, 1)' }, // Blue
+        { c1: 'rgba(255, 240, 150, 1)', c2: 'rgba(200, 180, 50, 1)' }, // Yellow
+        { c1: 'rgba(150, 255, 180, 1)', c2: 'rgba(50, 200, 90, 1)' },  // Green
+        { c1: 'rgba(220, 150, 255, 1)', c2: 'rgba(150, 50, 200, 1)' }, // Purple
+    ];
 
     const mostBookedRoomsData = {
         labels: [
@@ -289,14 +429,19 @@
                     {{ room.booking_count|default:0 }}{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 206, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(153, 102, 255, 0.8)'
-            ],
-            borderWidth: 2
+            backgroundColor: (context) => {
+                const chart = context.chart;
+                const { ctx, chartArea } = chart;
+                if (!chartArea) return 'rgba(255, 99, 132, 0.8)'; // Fallback
+
+                // Use the data index to select a color from the map
+                const colorIndex = context.dataIndex % mostBookedColors.length;
+                const { c1, c2 } = mostBookedColors[colorIndex];
+
+                return createGlossyGradient(ctx, chartArea.top, chartArea.bottom, c1, c2);
+            },
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+            borderWidth: 1.5
         }]
     };
 
@@ -306,13 +451,28 @@
         options: {
             indexAxis: 'y',
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: false, // Critical for fixed height container
             scales: {
                 x: {
                     beginAtZero: true,
+                    // Hide X-axis grid lines and ticks for a cleaner progress bar look
+                    grid: {
+                        display: false
+                    },
                     ticks: {
-                        stepSize: 1
+                        display: false
                     }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            elements: {
+                bar: {
+                    borderRadius: 10, // Increased rounded corners for pipe look
+                    borderSkipped: false,
                 }
             },
             plugins: {
@@ -336,9 +496,20 @@
                     {{ billiard.total_hours|default:0 }}{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ],
-            backgroundColor: 'rgba(54, 162, 235, 0.8)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            borderWidth: 2
+            // Use a function to apply the glossy gradient effect
+            backgroundColor: (context) => {
+                const chart = context.chart;
+                const { ctx, chartArea } = chart;
+                if (!chartArea) return 'rgba(241, 196, 15, 0.9)'; // Fallback
+
+                // Orange/Yellow gradient for Billiard Hours (similar to the orange/yellow bars in your image)
+                const color1 = 'rgba(255, 220, 100, 1)'; // Lighter yellow (Highlight)
+                const color2 = 'rgba(211, 136, 15, 1)';  // Darker orange (Base)
+
+                return createGlossyGradient(ctx, chartArea.top, chartArea.bottom, color1, color2);
+            },
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+            borderWidth: 1.5
         }]
     };
 
@@ -346,14 +517,30 @@
         type: 'bar',
         data: billiardHoursData,
         options: {
+            indexAxis: 'y', // Progress Chart: Make it horizontal
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: false, // Critical for fixed height container
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
+                    // Hide X-axis grid lines and ticks for a cleaner progress bar look
+                    grid: {
+                        display: false
+                    },
                     ticks: {
-                        stepSize: 1
+                        display: false
                     }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            elements: {
+                bar: {
+                    borderRadius: 10, // Increased rounded corners for pipe look
+                    borderSkipped: false,
                 }
             },
             plugins: {
@@ -393,7 +580,7 @@
         data: topMenuItemsData,
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: false, // Critical for fixed height container
             plugins: {
                 legend: {
                     position: 'bottom',
