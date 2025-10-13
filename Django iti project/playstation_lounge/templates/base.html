@@ -8,21 +8,33 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    
+    <!-- Custom CSS for Gradient Colors -->
+    <style>
+        /* Define the custom gradient based on the image provided (Purple to Red) */
+        .bg-custom-gradient {
+            background: linear-gradient(90deg, #8A2BE2 0%, #FF6347 100%); /* Purple (#8A2BE2) to Tomato Red (#FF6347) */
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary">
+    <!-- Navigation (Visible on Desktop, Toggler for Mobile) -->
+    <!-- Applying the custom gradient class to the navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-custom-gradient">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{% url 'facilities:room_list' %}">
                 <i class="fas fa-gamepad me-2"></i>Rio PlayStation Lounge
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <!-- Toggler for Mobile (points to the Offcanvas element) -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            
+            <!-- Desktop Navigation Menu (Visible on lg screens and up) -->
+            <div class="collapse navbar-collapse" id="navbarNavDesktop">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="facilitiesDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="facilitiesDropdownDesktop" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-building me-1"></i>Facilities
                         </a>
                         <ul class="dropdown-menu">
@@ -53,6 +65,57 @@
         </div>
     </nav>
 
+    <!-- Offcanvas Menu for Mobile -->
+    <div class="offcanvas offcanvas-end bg-light" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <!-- Applying the custom gradient class to the offcanvas header -->
+        <div class="offcanvas-header bg-custom-gradient text-white">
+            <h5 class="offcanvas-title fw-bold" id="offcanvasNavbarLabel">
+                <i class="fas fa-gamepad me-2"></i>Navigation
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Offcanvas Links -->
+            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                    <a class="nav-link fw-bold text-dark" href="{% url 'bookings:booking_create_step1' %}">
+                        <i class="fas fa-plus me-1 text-success"></i> New Booking (Quick)
+                    </a>
+                    <hr class="mt-2 mb-2">
+                </li>
+                
+                <!-- Facilities Section (Dropdown converted to direct links or accordion for better mobile UX) -->
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'facilities:room_list' %}">
+                        <i class="fas fa-tv me-2"></i>Gaming Rooms
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'facilities:billiard_list' %}">
+                        <i class="fas fa-circle me-2"></i>Billiard Tables
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'facilities:menu_list' %}">
+                        <i class="fas fa-utensils me-2"></i>Menu Items
+                    </a>
+                    <hr class="mt-2 mb-2">
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'bookings:booking_list' %}">
+                        <i class="fas fa-calendar-check me-2"></i>Bookings List
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'customers:customer_list' %}">
+                        <i class="fas fa-users me-2"></i>Customer Management
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <!-- Messages -->
     {% if messages %}
         <div class="container mt-3">
@@ -71,7 +134,8 @@
     {% endblock %}
 </main>
 
-<footer class="text-light text-center py-3">
+<!-- Applying the custom gradient class to the footer -->
+<footer class="text-light text-center py-3 bg-custom-gradient mt-auto">
     <div class="container">
         <p class="mb-0">&copy; 2025 Rio PlayStation Lounge. All rights reserved.</p>
     </div>
