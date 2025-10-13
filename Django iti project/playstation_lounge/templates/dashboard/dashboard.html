@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Rio PlayStation Lounge{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="fw-bold mb-3">
+                <i class="fas fa-chart-line me-2"></i>Dashboard
+            </h1>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label class="form-label fw-bold">Filter by Date Range:</label>
+                        </div>
+                        <div class="col-auto">
+                            <select name="filter" class="form-select" onchange="this.form.submit()">
+                                <option value="all" {% if date_filter == 'all' %}selected{% endif %}>All Time</option>
+                                <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Today</option>
+                                <option value="week" {% if date_filter == 'week' %}selected{% endif %}>Last 7 Days</option>
+                                <option value="month" {% if date_filter == 'month' %}selected{% endif %}>Last 30 Days</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Total Revenue</h6>
+                            <h2 class="fw-bold mb-0">${{ total_revenue|floatformat:2 }}</h2>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Total Bookings</h6>
+                            <h2 class="fw-bold mb-0">{{ total_bookings }}</h2>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Active Sessions</h6>
+                            <h2 class="fw-bold mb-0">{{ active_sessions }}</h2>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white-50 mb-1">Total Customers</h6>
+                            <h2 class="fw-bold mb-0">{{ total_customers }}</h2>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-coins me-2 text-success"></i>Revenue Breakdown
+                    </h5>
+                    <canvas id="revenueChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-clock me-2 text-primary"></i>Total Hours Played per Room
+                    </h5>
+                    <canvas id="roomHoursChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-trophy me-2 text-warning"></i>Most Booked Rooms
+                    </h5>
+                    <canvas id="mostBookedRoomsChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-circle me-2 text-info"></i>Billiard Tables Usage (Hours)
+                    </h5>
+                    <canvas id="billiardHoursChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-utensils me-2 text-danger"></i>Top Ordered Menu Items
+                    </h5>
+                    <canvas id="topMenuItemsChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">
+                        <i class="fas fa-user-friends me-2 text-success"></i>Top 10 Customers
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th class="text-end">Bookings</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in top_customers %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ customer.name }}</td>
+                                    <td>{{ customer.phone }}</td>
+                                    <td class="text-end">
+                                        <span class="badge bg-primary">{{ customer.booking_count }}</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">No customer data available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const revenueData = {
+        labels: ['Gaming Revenue', 'Billiard Revenue', 'Menu Revenue'],
+        datasets: [{
+            label: 'Revenue ($)',
+            data: [
+                {{ gaming_revenue|default:0 }},
+                {{ billiard_revenue|default:0 }},
+                {{ menu_revenue|default:0 }}
+            ],
+            backgroundColor: [
+                'rgba(102, 126, 234, 0.8)',
+                'rgba(118, 75, 162, 0.8)',
+                'rgba(237, 100, 166, 0.8)'
+            ],
+            borderColor: [
+                'rgba(102, 126, 234, 1)',
+                'rgba(118, 75, 162, 1)',
+                'rgba(237, 100, 166, 1)'
+            ],
+            borderWidth: 2
+        }]
+    };
+
+    const revenueChart = new Chart(document.getElementById('revenueChart'), {
+        type: 'doughnut',
+        data: revenueData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    const roomHoursData = {
+        labels: [
+            {% for room in room_hours_data %}
+                '{{ room.room__name }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Total Hours',
+            data: [
+                {% for room in room_hours_data %}
+                    {{ room.total_hours|default:0 }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: 'rgba(75, 192, 192, 0.8)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 2
+        }]
+    };
+
+    const roomHoursChart = new Chart(document.getElementById('roomHoursChart'), {
+        type: 'bar',
+        data: roomHoursData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    const mostBookedRoomsData = {
+        labels: [
+            {% for room in most_booked_rooms %}
+                '{{ room.room__name }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Booking Count',
+            data: [
+                {% for room in most_booked_rooms %}
+                    {{ room.booking_count|default:0 }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    };
+
+    const mostBookedRoomsChart = new Chart(document.getElementById('mostBookedRoomsChart'), {
+        type: 'bar',
+        data: mostBookedRoomsData,
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    const billiardHoursData = {
+        labels: [
+            {% for billiard in billiard_hours_data %}
+                '{{ billiard.billiard_table__name }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Total Hours',
+            data: [
+                {% for billiard in billiard_hours_data %}
+                    {{ billiard.total_hours|default:0 }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2
+        }]
+    };
+
+    const billiardHoursChart = new Chart(document.getElementById('billiardHoursChart'), {
+        type: 'bar',
+        data: billiardHoursData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    const topMenuItemsData = {
+        labels: [
+            {% for item in top_menu_items %}
+                '{{ item.menu_item__name }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Orders',
+            data: [
+                {% for item in top_menu_items %}
+                    {{ item.order_count|default:0 }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)'
+            ],
+            borderWidth: 2
+        }]
+    };
+
+    const topMenuItemsChart = new Chart(document.getElementById('topMenuItemsChart'), {
+        type: 'pie',
+        data: topMenuItemsData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
